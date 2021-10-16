@@ -28,9 +28,17 @@ export const PanelOptionCode: React.FC<Props> = ({ value, item, onChange }) => {
           height="200px"
           onBlur={(code) => {
             if (item.settings?.language === 'json' && code) {
-              code = JSON.parse(code);
+              let err: any;
+              try {
+                code = JSON.parse(code);
+              } catch (e) {
+                console.error(e);
+                err = e;
+              }
+              if (err) {
+                onChange(code);
+              }
             }
-            onChange(code);
           }}
         />
       )}

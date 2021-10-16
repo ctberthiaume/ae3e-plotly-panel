@@ -57,8 +57,6 @@
               "type": "date"
             }
           },
-          "onclick": "console.log(data)\nwindow.updateVariables({query:{'var-project':'toti'}, partial: true})",
-          "script": "console.log(data)\r\nvar trace = {\r\n  x: data.series[0].fields[0].values.buffer,\r\n  y: data.series[0].fields[1].values.buffer\r\n};\r\n\r\n\r\nreturn {data:[trace],layout:{title:'My Chart'}};",
           "title": "title"
         },
         "timeFrom": null,

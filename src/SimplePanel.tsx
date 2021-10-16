@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import { PanelProps } from '@grafana/data';
-import { getTemplateSrv, getLocationSrv } from '@grafana/runtime';
+//import { getTemplateSrv, getLocationSrv } from '@grafana/runtime';
+import { getTemplateSrv } from '@grafana/runtime';
 import { SimpleOptions, defaults } from 'types';
 import merge from 'deepmerge';
 import _ from 'lodash';
@@ -47,19 +48,23 @@ export class SimplePanel extends PureComponent<Props> {
     let parameters: any;
     parameters = [this.props.options.data, layout, config];
 
-    let error: any;
     try {
-      if (this.props.options.script !== '' && this.props.data.state !== 'Error') {
-        var f = new Function('data,variables', this.props.options.script);
+      if (this.props.data.state !== 'Error') {
+        var f = (data, variables) => {
+          console.log(data);
+          var trace = {
+            x: data.series[0].fields[1].values.buffer,
+            y: data.series[1].fields[1].values.buffer,
+          };
+          return { data: [trace], layout: {} };
+        };
         parameters = f(this.props.data, context);
         if (!parameters) {
           throw new Error('Script must return values');
         }
       }
     } catch (e) {
-      error = e;
       console.error(e);
-
       //Can't update chart when script is changing if throw error?!?
       //throw new Error('There\'s an error in your script. Check the console to see error\'s details');
     }
@@ -92,38 +97,27 @@ export class SimplePanel extends PureComponent<Props> {
 
     layout = { ...layout, autosize: true, height: this.props.height };
     let display: any;
-    if (error) {
-      let matches = error.stack.match(/anonymous>:.*\)/m);
-      let lines = matches ? matches[0].slice(0, -1).split(':') : null;
-      display = (
-        <div>
-          There&apos;s an error in your script : <br />
-          <span style={{ color: '#D00' }}>{error.toString()}</span>{' '}
-          {lines ? '- line ' + (parseInt(lines[1], 10) - 2) + ':' + lines[2] : ''} (Check your console for more details)
-        </div>
-      );
-    } else {
-      display = (
-        <Plot
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
-          data={parameters.data ? merge(data, parameters.data, { arrayMerge: combineMerge }) : data}
-          frames={parameters.frames ? merge(data, parameters.frames, { arrayMerge: combineMerge }) : frames}
-          onInitialized={(figure: any, graphDiv: any) => this.setState({ figure: figure, graphDiv: graphDiv })}
-          //layout={ {autosize:true, height:this.props.height, title: this.props.options.title} }
-          layout={parameters.layout ? merge(layout, parameters.layout) : layout}
-          config={parameters.config ? merge(config, parameters.config) : config}
-          useResizeHandler={true}
-          onClick={(data) => {
-            //console.log(data)
-            var f = new Function('data', 'getLocationSrv', 'getTemplateSrv', this.props.options.onclick);
-            f(data, getLocationSrv, getTemplateSrv);
-          }}
-        ></Plot>
-      );
-    }
+
+    display = (
+      <Plot
+        style={{
+          width: '100%',
+          height: '100%',
+        }}
+        data={parameters.data ? merge(data, parameters.data, { arrayMerge: combineMerge }) : data}
+        frames={parameters.frames ? merge(data, parameters.frames, { arrayMerge: combineMerge }) : frames}
+        onInitialized={(figure: any, graphDiv: any) => this.setState({ figure: figure, graphDiv: graphDiv })}
+        //layout={ {autosize:true, height:this.props.height, title: this.props.options.title} }
+        layout={parameters.layout ? merge(layout, parameters.layout) : layout}
+        config={parameters.config ? merge(config, parameters.config) : config}
+        useResizeHandler={true}
+        onClick={(data) => {
+          console.log(data);
+          //var f = new Function('data', 'getLocationSrv', 'getTemplateSrv', this.props.options.onclick);
+          //f(data, getLocationSrv, getTemplateSrv);
+        }}
+      ></Plot>
+    );
     return display;
   }
 }

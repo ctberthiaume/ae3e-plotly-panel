@@ -48,36 +48,5 @@ export const plugin = new PanelPlugin<SimpleOptions>(SimplePanel).setPanelOption
         initValue: defaults.config,
       },
       defaultValue: null, //defaults.config,
-    })
-    .addCustomEditor({
-      id: 'script',
-      path: 'script',
-      name: 'Script',
-      description: `
-            Script executed whenever new data is available.
-
-            Must return an object with one or more of the following properties : data, layout, config
-            f(data, variables){...your code...}
-            `,
-      editor: PanelOptionCode,
-      category: ['Script'],
-      settings: {
-        language: 'javascript',
-      },
-      defaultValue: defaults.script,
-    })
-    .addCustomEditor({
-      id: 'onclick',
-      path: 'onclick',
-      name: 'Click script',
-      description: `
-            Script executed when chart is clicked.
-            f(data){...your code...}`,
-      editor: PanelOptionCode,
-      category: ['Click script'],
-      settings: {
-        language: 'javascript',
-      },
-      defaultValue: defaults.onclick,
     });
 });

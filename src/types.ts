@@ -4,8 +4,6 @@ export interface SimpleOptions {
   config: object;
   data: any[];
   frames: any[];
-  script: string;
-  onclick: string;
 }
 
 export type EditorCodeType = string | undefined;
@@ -33,18 +31,8 @@ export const defaults: SimpleOptions = {
   data: [
     {
       type: 'scatter',
-      mode: 'lines',
-      line: { color: 'red', width: 2 },
+      mode: 'markers',
     },
   ],
   frames: [],
-  script: `console.log(data)
-var trace = {
-  x: data.series[0].fields[0].values.buffer,
-  y: data.series[0].fields[1].values.buffer
-};
-  
-return {data:[trace],layout:{title:'My Chart'}};`,
-  onclick: `console.log(data)
-window.updateVariables({query:{'var-project':'test'}, partial: true})`,
 };
